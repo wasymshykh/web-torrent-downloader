@@ -16,7 +16,7 @@ _wt.add(torrentMagnet, function(torrent) {
     const _bar = new cli.Bar(
         {
             format:
-                "[{bar}] {percentage}% - ETA: {timeeta}min - {value}Mb/{total}Mb - Speed: {speed}Kb/s"
+                "[{bar}] {percentage}% - ETA: {timeeta} - {value}Mb/{total}Mb - Speed: {speed}Kb/s"
         },
         cli.Presets.shades_grey
     );
@@ -29,8 +29,14 @@ _wt.add(torrentMagnet, function(torrent) {
     });
 
     torrent.on("download", () => {
+        let rem_seconds = torrent.timeRemaining / 1000;
+        let rem_hours = parseInt(rem_seconds / 3600); // remaining hours
+        rem_seconds = rem_seconds % 3600; // remaining seconds after - sub hours
+        let rem_minutes = parseInt(rem_seconds / 60); // remaining minutes
+        rem_seconds = parseInt(rem_seconds % 60); // remaing seconds after - sub minutes
+
         _bar.update((torrent.downloaded / (1024 * 1024)).toFixed(2), {
-            timeeta: (torrent.timeRemaining / (60 * 60)).toFixed(0),
+            timeeta: `${rem_hours}h ${rem_minutes}m ${rem_seconds}s`,
             speed: (torrent.downloadSpeed / 1024).toFixed(0)
         });
     });
