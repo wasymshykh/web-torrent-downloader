@@ -1,15 +1,15 @@
 {
-  "name": "torrentdownloader",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cli-progress": "^2.1.1",
-    "webtorrent": "^0.103.4"
-  }
+    "name": "torrentdownloader",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cli-progress": "^2.1.1",
+        "webtorrent": "^0.107.12"
+    }
 }

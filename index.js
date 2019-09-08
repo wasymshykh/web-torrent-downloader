@@ -5,24 +5,26 @@ const path = require("path");
 
 let _wt = new WebTorrent();
 
-let download_path = process.argv[2] ? process.argv[2].toString().trim() : false;
+let download_path = process.argv[2]
+    ? process.argv[2].toString().trim()
+    : "/home/wasym/Desktop/nodeProject/torrentDownloader";
 
 if (download_path) {
     download_path = path.normalize(download_path);
-
-    fs.readdir(download_path, (err, files) => {
-        if (err) {
-            console.log("Invalid download directory selected.");
-            process.exit(-1);
-        }
-    });
 }
 
 // magnet url
-let torrentMagnet =
-    "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c&dn=Big+Buck+Bunny&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F&xs=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fbig-buck-bunny.torrent";
+let torrentMagnet = process.argv[3]
+    ? process.argv[3].toString().trim()
+    : "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c&dn=Big+Buck+Bunny&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F&xs=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fbig-buck-bunny.torrent";
 
-_wt.add(torrentMagnet, torrent => {
+_wt.on("torrent", torrent => {
+    if (!fs.existsSync(download_path)) {
+        fs.mkdirSync(path.join(download_path, torrent.dn));
+    }
+});
+
+_wt.add(torrentMagnet, { path: download_path }, torrent => {
     let torrentsize = 0;
     torrent.files.forEach(file => {
         torrentsize += file.length / (1024 * 1024);
@@ -39,6 +41,7 @@ _wt.add(torrentMagnet, torrent => {
 
     torrent.on("done", () => {
         console.log("Finished downloading");
+
         _bar.stop();
         _wt.destroy();
     });
@@ -55,8 +58,6 @@ _wt.add(torrentMagnet, torrent => {
             speed: (torrent.downloadSpeed / 1024).toFixed(0)
         });
     });
-
-    // TODO on completion of download, move files to requested directory
 
     torrent.on("error", err => {
         console.log("Error!");
